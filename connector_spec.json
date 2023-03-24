@@ -31,7 +31,7 @@
       "maxLength": 60,
       "required": true,
       "description": "Payments Canada API URL",
-      "example": "https://api.payments.ca",
+      "default": "https://api.payments.ca",
       "helpSection": "Payments Canada API URL"
     }
   ]
