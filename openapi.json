@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "eti@cisco.io",
+      "name": "API Support"
+    },
+    "description": "This is a Kosha REST serice for exposing many Payments Canada FIF Product features as REST APIs with better consistency, observability and security etc",
+    "termsOfService": "http://swagger.io/terms/",
+    "title": "Payments CA FIF Product Connector API",
+    "version": "2.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/fif-branch-sandbox/branches/{dprn}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Direct Payment Routing Number (DPRN) which is a unique numerical number consisting of nine digits.",
+            "in": "path",
+            "name": "dprn",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/fifBranchResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "bad request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "permission denied"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "not found"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "internal server error"
+          }
+        },
+        "tags": [
+          "Channel"
+        ],
+        "description": "Retrieves the messages in a channel. Returns an array of message objects on success.",
+        "operationId": "get_all_messages_in_a_channel",
+        "summary": "Get Channel messages"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "fifBranchResponse": {
+        "type": "object",
+        "properties": {
+          "branchClassification": {
+            "type": "string"
+          },
+          "branchDomicile": {
+            "type": "string"
+          },
+          "civicAddress": {
+            "type": "string"
+          },
+          "crossReferenceNumber": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string"
+          },
+          "englishInstitutionName": {
+            "type": "string"
+          },
+          "exchangePoint": {
+            "type": "string"
+          },
+          "frenchInstitutionName": {
+            "type": "string"
+          },
+          "identificationNumber": {
+            "type": "string"
+          },
+          "indirectCreditsAcctNumber": {
+            "type": "string"
+          },
+          "indirectCreditsBranchIDNumber": {
+            "type": "string"
+          },
+          "indirectMICRAcctNumber": {
+            "type": "string"
+          },
+          "indirectMICRBranchIDNumber": {
+            "type": "string"
+          },
+          "languageCode": {
+            "type": "string"
+          },
+          "postalAddress": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "provinceCode": {
+            "type": "string"
+          },
+          "servicabilityCode": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "townCity": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "branchClassification",
+          "branchDomicile",
+          "civicAddress",
+          "crossReferenceNumber",
+          "effectiveDate",
+          "englishInstitutionName",
+          "exchangePoint",
+          "frenchInstitutionName",
+          "identificationNumber",
+          "indirectCreditsAcctNumber",
+          "indirectCreditsBranchIDNumber",
+          "indirectMICRAcctNumber",
+          "indirectMICRBranchIDNumber",
+          "languageCode",
+          "postalAddress",
+          "postalCode",
+          "provinceCode",
+          "servicabilityCode",
+          "status",
+          "townCity"
+        ]
+      }
+    }
+  }
+}

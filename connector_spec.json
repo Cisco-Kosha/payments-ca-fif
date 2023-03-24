@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "fields": [
+    {
+      "field": "CONSUMER_ID",
+      "displayName": "Application Consumer ID",
+      "type": "String",
+      "minLength": 4,
+      "maxLength": 60,
+      "required": true,
+      "description": "Application Consumer ID",
+      "example": "admin",
+      "helpSection": "Before calling an API, you need to generate an access token using the unique Consumer Key and Consumer Secret from your App. The Consumer Key and Consumer Secret for each App you create can be found in My Apps."
+    },
+    {
+      "field": "CONSUMER_SECRET",
+      "displayName": "Application Consumer Secret",
+      "type": "String",
+      "minLength": 4,
+      "maxLength": 60,
+      "required": true,
+      "description": "Application Consumer Secret",
+      "example": "admin",
+      "helpSection": "Before calling an API, you need to generate an access token using the unique Consumer Key and Consumer Secret from your App. The Consumer Key and Consumer Secret for each App you create can be found in My Apps."
+    },
+    {
+      "field": "SERVER_URL",
+      "displayName": "Payments Canada API URL",
+      "type": "String",
+      "minLength": 4,
+      "maxLength": 60,
+      "required": true,
+      "description": "Payments Canada API URL",
+      "example": "https://api.payments.ca",
+      "helpSection": "Payments Canada API URL"
+    }
+  ]
+}
