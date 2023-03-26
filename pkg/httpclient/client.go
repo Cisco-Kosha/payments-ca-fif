@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var token string
-
 func basicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
@@ -103,7 +101,7 @@ func Oauth2ApiRequest(headers map[string]string, method, url string, data interf
 	return respBody, response.StatusCode
 }
 
-func MakeHttpCall(headers map[string]string, consumerId, consumerSecret, method, serverUrl, url string, body interface{}, log logger.Logger) (interface{}, int, error) {
+func MakeHttpCall(headers map[string]string, consumerId, consumerSecret, method, serverUrl, url string, body interface{}, token string, log logger.Logger) (interface{}, int, error) {
 
 	var response interface{}
 	var payloadRes []byte
@@ -122,51 +120,40 @@ func MakeHttpCall(headers map[string]string, consumerId, consumerSecret, method,
 		if err != nil {
 			log.Error("Unable to parse response as json")
 			log.Error(err)
-			return nil, 500, err
+			return nil, http.StatusInternalServerError, err
 		}
 		if statusCode == 200 && response != nil {
 			return response, statusCode, nil
 		}
 	}
-	// token is not generated, or is invalid so get new token
-	grantTypeBody := "grant_type=client_credentials"
-	token, _ = getToken(consumerId, consumerSecret, serverUrl, log, grantTypeBody)
-	if token == "" {
-		return nil, 500, fmt.Errorf("error generating token")
-	}
-
-	var newResponse interface{}
-	tokenMap["access_token"] = token
-	payloadResponse, statusCode := Oauth2ApiRequest(headers, method, url, body, tokenMap, log)
-	if string(payloadResponse) == "" {
-		return nil, statusCode, fmt.Errorf("nil")
-	}
-	// Convert response body to target struct
-	err := json.Unmarshal(payloadResponse, &newResponse)
-	if err != nil {
-		log.Error("Unable to parse response as json")
-		log.Error(err)
-		return nil, 500, err
-	}
-
-	return newResponse, statusCode, nil
+	return nil, http.StatusInternalServerError, fmt.Errorf("token invalid")
 }
 
-func getToken(consumerId, consumerSecret, serverUrl string, log logger.Logger, body interface{}) (string, int) {
+func GenerateToken(consumerId, consumerSecret, serverUrl string, log logger.Logger) (string, string, error) {
+	// token is not generated, or is invalid so get new token
+	grantTypeBody := "grant_type=client_credentials"
+	token, expiresIn, _ := getToken(consumerId, consumerSecret, serverUrl, log, grantTypeBody)
+	if token == "" {
+		return "", "", fmt.Errorf("error generating token")
+	}
+	return token, expiresIn, nil
+}
+
+func getToken(consumerId, consumerSecret, serverUrl string, log logger.Logger, body interface{}) (string, string, int) {
 
 	var tokenResponse models.AccessToken
 
 	url := serverUrl + "/accesstoken"
 	res, _ := makeHttpBasicAuthReq(consumerId, consumerSecret, "POST", url, body, log)
 	if string(res) == "" {
-		return "", 500
+		return "", "", 500
 	}
 	// Convert response body to target struct
 	err := json.Unmarshal(res, &tokenResponse)
 	if err != nil {
 		log.Error("Unable to parse auth token response as json")
 		log.Error(err)
-		return "", 500
+		return "", "", 500
 	}
-	return tokenResponse.AccessToken, 200
+	return tokenResponse.AccessToken, tokenResponse.ExpiresIn, 200
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/kosha/payments-ca-fif/pkg/logger"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func (a *App) commonMiddleware(log logger.Logger) http.Handler {
@@ -20,6 +21,8 @@ func (a *App) commonMiddleware(log logger.Logger) http.Handler {
 			w.WriteHeader(200)
 			return
 		}
+
+		var err error
 
 		serverUrl := a.Cfg.GetServerURL()
 		requestUri := r.RequestURI
@@ -59,7 +62,21 @@ func (a *App) commonMiddleware(log logger.Logger) http.Handler {
 		}
 		consumerId, consumerSecret := a.Cfg.GetConsumerIDAndSecret()
 
-		res, statusCode, err := httpclient.MakeHttpCall(headers, consumerId, consumerSecret, method, a.Cfg.GetServerURL(), url, c, log)
+		var token string
+		var statusCode int
+		accessTokenMap, ok := a.TokenMap[consumerId]
+		if !ok || accessTokenMap.AccessToken == "" {
+			token = a.getToken(consumerId, consumerSecret, a.Cfg.GetServerURL(), log)
+		} else {
+			expiryIn := accessTokenMap.ExpiresIn
+			if expiryIn.Before(time.Now()) {
+				token = a.getToken(consumerId, consumerSecret, a.Cfg.GetServerURL(), log)
+			} else {
+				token = accessTokenMap.AccessToken
+			}
+		}
+
+		res, statusCode, err := httpclient.MakeHttpCall(headers, consumerId, consumerSecret, method, a.Cfg.GetServerURL(), url, c, token, log)
 		if err != nil {
 			a.Log.Errorf("Encountered an error while making a call: %v\n", err)
 			respondWithError(w, statusCode, err.Error())
@@ -72,6 +89,18 @@ func (a *App) commonMiddleware(log logger.Logger) http.Handler {
 		return
 
 	})
+}
+
+func (a *App) getToken(consumerId, consumerSecret, serverUrl string, log logger.Logger) string {
+	token, expiresIn, _ := httpclient.GenerateToken(consumerId, consumerSecret, a.Cfg.GetServerURL(), log)
+
+	duration, _ := time.ParseDuration(expiresIn + "s")
+
+	a.TokenMap[consumerId] = &TokenExpires{
+		AccessToken: token,
+		ExpiresIn:   time.Now().Add(duration),
+	}
+	return token
 }
 
 func (a *App) InitializeRoutes(log logger.Logger) {

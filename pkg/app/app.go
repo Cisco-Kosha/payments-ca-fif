@@ -6,12 +6,19 @@ import (
 	"github.com/kosha/payments-ca-fif/pkg/logger"
 	"log"
 	"net/http"
+	"time"
 )
 
 type App struct {
-	Router *mux.Router
-	Log    logger.Logger
-	Cfg    *config.Config
+	Router   *mux.Router
+	Log      logger.Logger
+	Cfg      *config.Config
+	TokenMap map[string]*TokenExpires
+}
+
+type TokenExpires struct {
+	AccessToken string    `json:"access_token,omitempty"`
+	ExpiresIn   time.Time `json:"expires_in,omitempty"`
 }
 
 func router() *mux.Router {
@@ -36,6 +43,8 @@ func (a *App) Initialize(log logger.Logger) {
 
 	a.Cfg = cfg
 	a.Log = log
+
+	a.TokenMap = make(map[string]*TokenExpires)
 
 	a.Router = router()
 }
