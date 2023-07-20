@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
+	"strconv"
 
 	"github.com/kosha/payments-ca-fif/pkg/app"
 	"github.com/kosha/payments-ca-fif/pkg/logger"
